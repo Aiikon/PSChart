@@ -1,4 +1,7 @@
-﻿Function New-PSChart
+﻿[void][Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms')
+[void][Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms.DataVisualization')
+
+Function New-PSChart
 {
     [CmdletBinding(PositionalBinding=$false)]
     Param
@@ -21,7 +24,10 @@
         [Parameter()] [ValidateSet('Left', 'Top', 'Right', 'Bottom')] [string] $LegendPosition,
         [Parameter()] [int] $Width,
         [Parameter()] [int] $Height,
-        [Parameter()] [string] $Title
+        [Parameter()] [string] $Title,
+        [Parameter()] [int] $XAxisInterval = 1,
+        [Parameter()] [int] $YAxisInterval,
+        [Parameter()] [System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles] $XAxisAutoFitStyle
         
     )
     Begin
@@ -36,9 +42,6 @@
     End
     {
         trap { $PSCmdlet.ThrowTerminatingError($_) }
-
-        [void][Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms')
-        [void][Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms.DataVisualization')
 
         if ($UngroupedInput)
         {
@@ -63,6 +66,12 @@
         $chart.Palette = [System.Windows.Forms.DataVisualization.Charting.ChartColorPalette]::None
         $chart.PaletteCustomColors = Get-PSChartColors
         $chart.BackColor = 'White'
+
+        if($YAxisInterval) { $chart.ChartAreas[0].AxisY.MajorGrid.Interval = $YAxisInterval }
+        $chart.ChartAreas[0].AxisX.LabelAutoFitStyle = [System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles]::StaggeredLabels
+        $chart.ChartAreas[0].AxisX.Interval = $XAxisInterval
+        $chart.ChartAreas[0].AxisX.MajorGrid.Enabled = $false
+        if ($XAxisAutoFitStyle) { $chart.ChartAreas[0].AxisX.LabelAutoFitStyle = $XAxisAutoFitStyle }
 
         $parameterDict = @{} + $PSBoundParameters
         $splatDict = @{}
@@ -243,9 +252,8 @@ Function New-PSChartDataSeries
         {
             $series.SetCustomProperty('PieLabelStyle', 'Outside')
             $series.SetCustomProperty('PieLineColor', 'Black')
+            $series.Label = "$LegendText (#VALY)"
         }
-
-        $series.Label = "$LegendText (#VALY)"
 
         if (!$XProperty)
         {
@@ -262,7 +270,7 @@ Function New-PSChartDataSeries
             if (!$LegendText)
             {
                 $dataPoint.LegendText = $dataPoint.AxisLabel
-                $dataPoint.Label = "$($dataPoint.AxisLabel) (#VALY)"
+                if ($Type -eq 'Pie') { $dataPoint.Label = "$($dataPoint.AxisLabel) (#VALY)" }
             }
             $series.Points.Add($dataPoint)
         }
