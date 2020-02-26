@@ -26,7 +26,8 @@ Function New-PSChart
         [Parameter()] [string] $Title,
         [Parameter()] [int] $XAxisInterval = 1,
         [Parameter()] [int] $YAxisInterval,
-        [Parameter()] [System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles] $XAxisAutoFitStyle
+        [Parameter()] [System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles] $XAxisAutoFitStyle,
+        [Parameter()] [object] $BackColor = 'White'
         
     )
     Begin
@@ -46,12 +47,13 @@ Function New-PSChart
         $chart.ChartAreas.Add((New-Object System.Windows.Forms.DataVisualization.Charting.ChartArea))
         $chart.Palette = [System.Windows.Forms.DataVisualization.Charting.ChartColorPalette]::None
         $chart.PaletteCustomColors = Get-PSChartColors
-        $chart.BackColor = 'White'
+        $chart.BackColor = $BackColor
 
         if($YAxisInterval) { $chart.ChartAreas[0].AxisY.MajorGrid.Interval = $YAxisInterval }
         $chart.ChartAreas[0].AxisX.LabelAutoFitStyle = [System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles]::StaggeredLabels
         $chart.ChartAreas[0].AxisX.Interval = $XAxisInterval
         $chart.ChartAreas[0].AxisX.MajorGrid.Enabled = $false
+        $chart.ChartAreas[0].BackColor = $BackColor
         if ($XAxisAutoFitStyle) { $chart.ChartAreas[0].AxisX.LabelAutoFitStyle = $XAxisAutoFitStyle }
 
         $parameterDict = @{} + $PSBoundParameters
@@ -66,6 +68,7 @@ Function New-PSChart
             if($parameterDict.Contains($parameter)) { $splatDict[$parameter] = $parameterDict[$parameter] }
         }
         $splatDict.Remove('InputObject')
+        $splatDict.Remove('BackColor')
 
         if ($ZProperty)
         {
@@ -103,6 +106,7 @@ Function New-PSChart
 
         $legend = New-Object System.Windows.Forms.DataVisualization.Charting.Legend
         $legend.Name = 'Legend0'
+        $legend.BackColor = $BackColor
 
         if ($LegendPosition -in 'Left', 'Right', 'Top', 'Bottom')
         {
