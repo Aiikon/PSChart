@@ -21,7 +21,7 @@ Function New-PSChart
         [Parameter()] [switch] $UngroupedInput,
         [Parameter()] [string] $GroupProperty = 'Group',
         [Parameter()] [switch] $NoChartBorder,
-        [Parameter()] [ValidateSet('Left', 'Top', 'Right', 'Bottom')] [string] $LegendPosition,
+        [Parameter()] [ValidateSet('Left', 'Top', 'Right', 'Bottom', 'None')] [string] $LegendPosition,
         [Parameter()] [int] $Width,
         [Parameter()] [int] $Height,
         [Parameter()] [string] $Title,
@@ -123,27 +123,12 @@ Function New-PSChart
         $legend = New-Object System.Windows.Forms.DataVisualization.Charting.Legend
         $legend.Name = 'Legend0'
 
-        if ($LegendPosition)
+        if ($LegendPosition -in 'Left', 'Right', 'Top', 'Bottom')
         {
-            if ($LegendPosition -eq 'Left')
-            {
-                $legend.Docking = 'Left'
-            }
-            elseif ($LegendPosition -eq 'Right')
-            {
-                $legend.Docking = 'Right'
-            }
-            elseif ($LegendPosition -eq 'Top')
-            {
-                $legend.Docking = 'Top'
-            }
-            else
-            {
-                $legend.Docking = 'Bottom'
-            }
+            $legend.Docking = $LegendPosition
         }
 
-        $chart.Legends.Add($legend)
+        if ($LegendPosition -ne 'None') { $chart.Legends.Add($legend) }
 
         if ($Width) { $chart.Width = $Width }
         if ($Height) { $chart.Height = $Height }

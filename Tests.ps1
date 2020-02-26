@@ -81,11 +81,13 @@ $defaults2.ZProperty = 'Month'
     $dataSet1 | New-PSChart @defaultsPie -Title "Pie Legend Bottom" -LegendPosition Bottom
     $dataSet1 | New-PSChart @defaultsPie -Title "Pie Legend Left" -LegendPosition Left
     $dataSet1 | New-PSChart @defaultsPie -Title "Pie Legend Top" -LegendPosition Top
+    $dataSet1 | New-PSChart @defaultsPie -Title "Pie Legend None" -LegendPosition None
     
     $dataSet2 | New-PSChart @defaultsColumn -ZProperty Month -Title "Column Legend Right" -LegendPosition Right
     $dataSet2 | New-PSChart @defaultsColumn -ZProperty Month -Title "Column Legend Bottom" -LegendPosition Bottom
     $dataSet2 | New-PSChart @defaultsColumn -ZProperty Month -Title "Column Legend Left" -LegendPosition Left
     $dataSet2 | New-PSChart @defaultsColumn -ZProperty Month -Title "Column Legend Top" -LegendPosition Top
+    $dataSet2 | New-PSChart @defaultsColumn -ZProperty Month -Title "Column Legend None" -LegendPosition None
 
     "<h1>Assorted Styles</h1>"
 
