@@ -102,6 +102,15 @@ $defaultsStackedColumn.Type = 'StackedColumn'
     $dataSet1 | Select-Object *, @{Name='NewLabel'; Expression={"Count: $($_.Count)"}} | New-PSChart @defaultsColumn -Title "Column LabelProperty" -LabelProperty NewLabel
     $dataSet2 | Select-Object *, @{Name='NewLabel'; Expression={"Count: $($_.Count)"}} | New-PSChart @defaultsStackedColumn -Title "StackedColumn LabelProperty" -LabelProperty NewLabel
 
+    "<h1>Pie Chart Styles</h1>"
+    $dataSet1 | New-PSChart @defaultsPie -PieStartAngle 180 -Title "Pie Start Angle 180"
+    $dataSet1 | New-PSChart @defaultsPie -PieStartAngle 270 -Title "Pie Start Angle 270"
+    $dataSet1 | New-PSChart @defaultsPie -PieLabelStyle Disabled -Title "Pie Label Style Disabled"
+    $dataSet1 | New-PSChart @defaultsPie -PieLabelStyle Inside -Title "Pie Label Style Inside"
+    $dataSet1 | New-PSChart @defaultsPie -PieLabelStyle Outside -Title "Pie Label Style Outside"
+    $dataSet1 | New-PSChart @defaultsPie -PieLabelStyle Ellipse -Title "Pie Label Style Ellipse"
+    $dataSet1 | New-PSChart @defaultsPie -PieLineColor Cyan -Title 'Pie Line Color Cyan'
+    $dataSet1 | New-PSChart @defaultsPie -PieLineColor Transparent -Title 'Pie Line Color Transparent'
 
 
 ) | Out-File $env:TEMP\PSChartTests.html

@@ -27,8 +27,10 @@ Function New-PSChart
         [Parameter()] [int] $XAxisInterval = 1,
         [Parameter()] [int] $YAxisInterval,
         [Parameter()] [System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles] $XAxisAutoFitStyle,
-        [Parameter()] [object] $BackColor = 'White'
-        
+        [Parameter()] [object] $BackColor = 'White',
+        [Parameter()] [object] $PieStartAngle = 0,
+        [Parameter()] [object] $PieLineColor = 'Black',
+        [Parameter()] [ValidateSet('Disabled', 'Inside', 'Outside', 'Ellipse')] [string] $PieLabelStyle = 'Outside'
     )
     Begin
     {
@@ -202,7 +204,10 @@ Function New-PSChartDataSeries
             [string] $Type,
         [Parameter()] [string] $XProperty,
         [Parameter()] [string] $YProperty = 'Count',
-        [Parameter()] [string] $LabelProperty
+        [Parameter()] [string] $LabelProperty,
+        [Parameter()] [int] $PieStartAngle = 0,
+        [Parameter()] [object] $PieLineColor = 'Black',
+        [Parameter()] [ValidateSet('Disabled', 'Inside', 'Outside', 'Ellipse')] [string] $PieLabelStyle = 'Outside'
     )
     Begin
     {
@@ -218,10 +223,11 @@ Function New-PSChartDataSeries
         $series = New-Object System.Windows.Forms.DataVisualization.Charting.Series
         $series.ChartType = $Type
         $series.LegendText = $LegendText
-        if ($Type -eq 'Pie')
+        if ($Type -in 'Pie', 'Doughnut')
         {
-            $series.SetCustomProperty('PieLabelStyle', 'Outside')
-            $series.SetCustomProperty('PieLineColor', 'Black')
+            $series.SetCustomProperty('PieLabelStyle', $PieLabelStyle)
+            $series.SetCustomProperty('PieLineColor', $PieLineColor)
+            $series.SetCustomProperty('PieStartAngle', $PieStartAngle)
             if ($LabelProperty)
             {
                 $series.Label = $InputObject.$LabelProperty
@@ -247,7 +253,7 @@ Function New-PSChartDataSeries
             if (!$LegendText)
             {
                 $dataPoint.LegendText = $dataPoint.AxisLabel
-                if ($Type -eq 'Pie') { $dataPoint.Label = "$($dataPoint.AxisLabel) (#VALY)" }
+                if ($Type -in 'Pie', 'Doughnut') { $dataPoint.Label = "$($dataPoint.AxisLabel) (#VALY)" }
             }
             if ($LabelProperty) { $dataPoint.Label = $object.$LabelProperty }
             $series.Points.Add($dataPoint)
