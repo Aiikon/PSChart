@@ -51,7 +51,7 @@ Function New-PSChart
         $chart.PaletteCustomColors = Get-PSChartColors
         $chart.BackColor = $BackColor
 
-        if($YAxisInterval) { $chart.ChartAreas[0].AxisY.MajorGrid.Interval = $YAxisInterval }
+        if ($YAxisInterval) { $chart.ChartAreas[0].AxisY.MajorGrid.Interval = $YAxisInterval }
         $chart.ChartAreas[0].AxisX.LabelAutoFitStyle = [System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles]::StaggeredLabels
         $chart.ChartAreas[0].AxisX.Interval = $XAxisInterval
         $chart.ChartAreas[0].AxisX.MajorGrid.Enabled = $false
@@ -67,7 +67,7 @@ Function New-PSChart
         }
         foreach ($parameter in $Script:NewPSChartDataSeriesParameters)
         {
-            if($parameterDict.Contains($parameter)) { $splatDict[$parameter] = $parameterDict[$parameter] }
+            if ($parameterDict.Contains($parameter)) { $splatDict[$parameter] = $parameterDict[$parameter] }
         }
         $splatDict.Remove('InputObject')
         $splatDict.Remove('BackColor')
