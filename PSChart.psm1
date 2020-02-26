@@ -18,8 +18,6 @@ Function New-PSChart
         [Parameter(Position=2)] [string] $YProperty = 'Count',
         [Parameter(Position=3)] [string] $ZProperty,
         [Parameter(Mandatory=$true)] [ValidateSet('ImgTag', 'WinFormControl', 'WpfControl')] [string] $As,
-        [Parameter()] [switch] $UngroupedInput,
-        [Parameter()] [string] $GroupProperty = 'Group',
         [Parameter()] [string] $LabelProperty,
         [Parameter()] [switch] $NoChartBorder,
         [Parameter()] [ValidateSet('Left', 'Top', 'Right', 'Bottom', 'None')] [string] $LegendPosition,
@@ -43,24 +41,6 @@ Function New-PSChart
     End
     {
         trap { $PSCmdlet.ThrowTerminatingError($_) }
-
-        if ($UngroupedInput)
-        {
-            if ($PSBoundParameters['YProperty']) { throw '-YProperty cannot be provided with -UngroupedInput' }
-            if (!$XProperty) { $XProperty = $inputObjectList[0].PSObject.Properties.Name | Select-Object -First 1 }
-            $keys = @($XProperty)
-            if ($ZProperty) { $keys += $ZProperty }
-            $dictionary = $inputObjectList | ConvertTo-Dictionary $keys
-            $inputObjectList = foreach ($group in $dictionary.Values)
-            {
-                $result = [ordered]@{}
-                $result.$XProperty = $group[0].$XProperty
-                if ($ZProperty) { $result.$ZProperty = $group[0].$ZProperty }
-                $result.$YProperty = $group.Count
-                $result.$GroupProperty = $group
-                [pscustomobject]$result
-            }
-        }
 
         $chart = New-Object System.Windows.Forms.DataVisualization.Charting.Chart
         $chart.ChartAreas.Add((New-Object System.Windows.Forms.DataVisualization.Charting.ChartArea))
@@ -218,7 +198,6 @@ Function New-PSChartDataSeries
             [string] $Type,
         [Parameter()] [string] $XProperty,
         [Parameter()] [string] $YProperty = 'Count',
-        [Parameter()] [string] $GroupProperty = 'Group',
         [Parameter()] [string] $LabelProperty
     )
     Begin
