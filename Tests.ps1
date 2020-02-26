@@ -101,6 +101,7 @@ $defaultsStackedColumn.Type = 'StackedColumn'
     $dataSet1 | Select-Object *, @{Name='NewLabel'; Expression={"Count: $($_.Count)"}} | New-PSChart @defaultsPie -Title "Pie LabelProperty" -LabelProperty NewLabel
     $dataSet1 | Select-Object *, @{Name='NewLabel'; Expression={"Count: $($_.Count)"}} | New-PSChart @defaultsColumn -Title "Column LabelProperty" -LabelProperty NewLabel
     $dataSet2 | Select-Object *, @{Name='NewLabel'; Expression={"Count: $($_.Count)"}} | New-PSChart @defaultsStackedColumn -Title "StackedColumn LabelProperty" -LabelProperty NewLabel
+    $dataSet1 | New-PSChart @defaultsPie -ChartColors Red, Green, Blue -Title "Custom Colors"
 
     "<h1>Pie Chart Styles</h1>"
     $dataSet1 | New-PSChart @defaultsPie -PieStartAngle 180 -Title "Pie Start Angle 180"

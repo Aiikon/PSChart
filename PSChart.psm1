@@ -30,7 +30,8 @@ Function New-PSChart
         [Parameter()] [object] $BackColor = 'White',
         [Parameter()] [object] $PieStartAngle = 0,
         [Parameter()] [object] $PieLineColor = 'Black',
-        [Parameter()] [ValidateSet('Disabled', 'Inside', 'Outside', 'Ellipse')] [string] $PieLabelStyle = 'Outside'
+        [Parameter()] [ValidateSet('Disabled', 'Inside', 'Outside', 'Ellipse')] [string] $PieLabelStyle = 'Outside',
+        [Parameter()] [object[]] $ChartColors
     )
     Begin
     {
@@ -49,6 +50,7 @@ Function New-PSChart
         $chart.ChartAreas.Add((New-Object System.Windows.Forms.DataVisualization.Charting.ChartArea))
         $chart.Palette = [System.Windows.Forms.DataVisualization.Charting.ChartColorPalette]::None
         $chart.PaletteCustomColors = Get-PSChartColors
+        if ($ChartColors) { $chart.PaletteCustomColors = $ChartColors }
         $chart.BackColor = $BackColor
 
         if ($YAxisInterval) { $chart.ChartAreas[0].AxisY.MajorGrid.Interval = $YAxisInterval }
