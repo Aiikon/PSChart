@@ -70,7 +70,6 @@ Function New-PSChart
             if ($parameterDict.Contains($parameter)) { $splatDict[$parameter] = $parameterDict[$parameter] }
         }
         $splatDict.Remove('InputObject')
-        $splatDict.Remove('BackColor')
 
         if ($ZProperty)
         {
