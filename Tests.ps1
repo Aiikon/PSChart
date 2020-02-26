@@ -41,6 +41,9 @@ $defaultsColumn.Type = 'Column'
 $defaults2 = @{} + $defaults1
 $defaults2.ZProperty = 'Month'
 
+$defaultsStackedColumn = @{} + $defaults2
+$defaultsStackedColumn.Type = 'StackedColumn'
+
 @(
     "<h1>Baseline</h1>"
 
@@ -93,6 +96,12 @@ $defaults2.ZProperty = 'Month'
 
     $dataSet1 | New-PSChart @defaultsPie -NoChartBorder -Title "No Chart Border"
     $dataSet1 | New-PSChart -Width ($width*2) -Height ($height*2) -Type Pie -As ImgTag -XProperty Label -YProperty Count -Title "Double Width/Height"
+    
+    $dataSet1 | Select-Object *, @{Name='NewLabel'; Expression={"Count: $($_.Count)"}} | New-PSChart @defaultsPie -Title "Pie LabelProperty" -LabelProperty NewLabel
+    $dataSet1 | Select-Object *, @{Name='NewLabel'; Expression={"Count: $($_.Count)"}} | New-PSChart @defaultsColumn -Title "Column LabelProperty" -LabelProperty NewLabel
+    $dataSet2 | Select-Object *, @{Name='NewLabel'; Expression={"Count: $($_.Count)"}} | New-PSChart @defaultsStackedColumn -Title "StackedColumn LabelProperty" -LabelProperty NewLabel
+
+
 
 ) | Out-File $env:TEMP\PSChartTests.html
 

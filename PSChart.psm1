@@ -20,6 +20,7 @@ Function New-PSChart
         [Parameter(Mandatory=$true)] [ValidateSet('ImgTag', 'WinFormControl', 'WpfControl')] [string] $As,
         [Parameter()] [switch] $UngroupedInput,
         [Parameter()] [string] $GroupProperty = 'Group',
+        [Parameter()] [string] $LabelProperty,
         [Parameter()] [switch] $NoChartBorder,
         [Parameter()] [ValidateSet('Left', 'Top', 'Right', 'Bottom', 'None')] [string] $LegendPosition,
         [Parameter()] [int] $Width,
@@ -217,7 +218,8 @@ Function New-PSChartDataSeries
             [string] $Type,
         [Parameter()] [string] $XProperty,
         [Parameter()] [string] $YProperty = 'Count',
-        [Parameter()] [string] $GroupProperty = 'Group'
+        [Parameter()] [string] $GroupProperty = 'Group',
+        [Parameter()] [string] $LabelProperty
     )
     Begin
     {
@@ -237,7 +239,14 @@ Function New-PSChartDataSeries
         {
             $series.SetCustomProperty('PieLabelStyle', 'Outside')
             $series.SetCustomProperty('PieLineColor', 'Black')
-            $series.Label = "$LegendText (#VALY)"
+            if ($LabelProperty)
+            {
+                $series.Label = $InputObject.$LabelProperty
+            }
+            else
+            {
+                $series.Label = "$LegendText (#VALY)"
+            }
         }
 
         if (!$XProperty)
@@ -257,6 +266,7 @@ Function New-PSChartDataSeries
                 $dataPoint.LegendText = $dataPoint.AxisLabel
                 if ($Type -eq 'Pie') { $dataPoint.Label = "$($dataPoint.AxisLabel) (#VALY)" }
             }
+            if ($LabelProperty) { $dataPoint.Label = $object.$LabelProperty }
             $series.Points.Add($dataPoint)
         }
 
