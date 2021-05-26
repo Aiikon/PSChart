@@ -68,12 +68,18 @@ $defaultsStackedColumn.Type = 'StackedColumn'
     $dataSet1 | New-PSChart @defaultsPie
     $dataSet1 | New-PSChart @defaultsPie -Title "Chart Title"
 
-    "<h1>Sparkline</h1>"
+    "<h1>Sparklines</h1>"
     $dataSet3 |
-        New-PSSparklineChart -As ImgTag -Width 500 -Height 50 -XProperty Timestamp -YProperty Value -ZProperty Series -SeriesColors @{
+        New-PSSparklineChart -As ImgTag -Width 500 -Height 50 -XProperty Timestamp -YProperty Value -ZProperty Series
+    "<br />"
+    1..20 | ForEach-Object { [pscustomobject]@{Timestamp = [DateTime]::Today.AddMinutes($_); Value = 1..(($_ % 10)*10) | Get-Random } } |
+        New-PSSparklineChart -As ImgTag -Width 500 -Height 50 -XProperty Timestamp -YProperty Value -ZProperty Series -Type Spline
+    "<br />"
+    $dataSet3 |
+        New-PSSparklineChart -As ImgTag -Width 500 -Height 50 -XProperty Timestamp -YProperty Value -ZProperty Series -YAxisMaximum 100 -SeriesColors @{
             A = 'Green'
             B = 'Orange'
-        }
+        } -XAxisMinimum ([DateTime]::Today.AddMinutes(-60)) -XAxisMaximum ([DateTime]::Today.AddMinutes(360*2))
 
     "<h1>Single Series Types</h1>"
 

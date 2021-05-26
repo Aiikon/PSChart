@@ -168,6 +168,7 @@ Function New-PSSparklineChart
     Param
     (
         [Parameter(ValueFromPipeline=$true)] [object] $InputObject,
+        [Parameter()] [ValidateSet('Spline', 'FastLine')] [string] $Type = 'FastLine',
         [Parameter(Mandatory=$true)] [string] $XProperty,
         [Parameter(Mandatory=$true)] [string] $YProperty,
         [Parameter()] [string] $ZProperty,
@@ -175,6 +176,8 @@ Function New-PSSparklineChart
         [Parameter()] [int] $Width,
         [Parameter()] [int] $Height,
         [Parameter()] [double] $YAxisMaximum,
+        [Parameter()] [datetime] $XAxisMinimum,
+        [Parameter()] [datetime] $XAxisMaximum,
         [Parameter()] [hashtable] $SeriesColors
     )
     Begin
@@ -217,6 +220,8 @@ Function New-PSSparklineChart
         $chart.ChartAreas[0].Position.Height = 100
 
         if ($YAxisMaximum) { $chart.ChartAreas[0].AxisY.Maximum = $YAxisMaximum }
+        if ($XAxisMinimum) { $chart.ChartAreas[0].AxisX.Minimum = $XAxisMinimum.ToOADate() }
+        if ($XAxisMaximum) { $chart.ChartAreas[0].AxisX.Maximum = $XAxisMaximum.ToOADate() }
 
         if (!$ZProperty) { $ZProperty = [Guid]::NewGuid().ToString() }
         $seriesGroupList = $inputObjectList |
@@ -225,7 +230,7 @@ Function New-PSSparklineChart
         foreach ($seriesGroup in $seriesGroupList.GetEnumerator())
         {
             $series = [System.Windows.Forms.DataVisualization.Charting.Series]::new()
-            $series.ChartType = 'FastLine'
+            $series.ChartType = $Type
             $series.XValueType = [System.Windows.Forms.DataVisualization.Charting.ChartValueType]::DateTime
             if ($SeriesColors) { $series.Color = $SeriesColors[$seriesGroup.Key] }
             foreach ($dataPointObject in $seriesGroup.Value)
