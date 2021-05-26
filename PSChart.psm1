@@ -162,6 +162,101 @@ Function New-PSChart
     }
 }
 
+Function New-PSSparklineChart
+{
+    [CmdletBinding(PositionalBinding=$false)]
+    Param
+    (
+        [Parameter(ValueFromPipeline=$true)] [object] $InputObject,
+        [Parameter(Mandatory=$true)] [string] $XProperty,
+        [Parameter(Mandatory=$true)] [string] $YProperty,
+        [Parameter()] [string] $ZProperty,
+        [Parameter(Mandatory=$true)] [ValidateSet('ImgTag')] [string] $As,
+        [Parameter()] [int] $Width,
+        [Parameter()] [int] $Height,
+        [Parameter()] [double] $YAxisMaximum,
+        [Parameter()] [hashtable] $SeriesColors
+    )
+    Begin
+    {
+        $inputObjectList = New-Object System.Collections.Generic.List[object]
+    }
+    Process
+    {
+        if (!$InputObject) { return }
+        $inputObjectList.Add($InputObject)
+    }
+    End
+    {
+        trap { $PSCmdlet.ThrowTerminatingError($_) }
+
+        $chart = [System.Windows.Forms.DataVisualization.Charting.Chart]::new()
+        $chart.ChartAreas.Add(([System.Windows.Forms.DataVisualization.Charting.ChartArea]::new()))
+        $chart.Palette = [System.Windows.Forms.DataVisualization.Charting.ChartColorPalette]::None
+        $chart.PaletteCustomColors = Get-PSChartColors
+        $chart.BackColor = 'White'
+        $chart.Width = $Width
+        $chart.Height = $Height
+
+        $chart.ChartAreas[0].AxisX.MajorGrid.Enabled = $false
+        $chart.ChartAreas[0].AxisX.MajorTickMark.Enabled = $false
+        $chart.ChartAreas[0].AxisX.LabelStyle.Enabled = $false
+        $chart.ChartAreas[0].AxisX.LineWidth = 0
+        $chart.ChartAreas[0].AxisY.MajorGrid.Enabled = $false
+        $chart.ChartAreas[0].AxisY.MajorTickMark.Enabled = $false
+        $chart.ChartAreas[0].AxisY.LabelStyle.Enabled = $false
+        $chart.ChartAreas[0].AxisY.LineWidth = 0
+
+        $chart.ChartAreas[0].AxisX.IntervalType = [System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType]::Seconds
+        $chart.ChartAreas[0].AxisX.Interval = 1
+
+        $chart.ChartAreas[0].Position.Auto = $false
+        $chart.ChartAreas[0].Position.X = 0
+        $chart.ChartAreas[0].Position.Width = 100
+        $chart.ChartAreas[0].Position.Y = 0
+        $chart.ChartAreas[0].Position.Height = 100
+
+        if ($YAxisMaximum) { $chart.ChartAreas[0].AxisY.Maximum = $YAxisMaximum }
+
+        if (!$ZProperty) { $ZProperty = [Guid]::NewGuid().ToString() }
+        $seriesGroupList = $inputObjectList |
+            ConvertTo-Dictionary -Keys $ZProperty -Ordered
+
+        foreach ($seriesGroup in $seriesGroupList.GetEnumerator())
+        {
+            $series = [System.Windows.Forms.DataVisualization.Charting.Series]::new()
+            $series.ChartType = 'FastLine'
+            $series.XValueType = [System.Windows.Forms.DataVisualization.Charting.ChartValueType]::DateTime
+            if ($SeriesColors) { $series.Color = $SeriesColors[$seriesGroup.Key] }
+            foreach ($dataPointObject in $seriesGroup.Value)
+            {
+                $dataPoint = [System.Windows.Forms.DataVisualization.Charting.DataPoint]::new()
+                $dataPoint.XValue = ([datetime]$dataPointObject.$XProperty).ToOADate()
+                $dataPoint.YValues = $dataPointObject.$YProperty
+                $series.Points.Add($dataPoint)
+            }
+            $chart.Series.Add($series)
+        }
+
+        if ($As -eq 'ImgTag')
+        {
+            if (!$Width) { $chart.Width = [Math]::Ceiling([System.Windows.SystemParameters]::PrimaryScreenWidth * 0.40) }
+            if (!$Height) { $chart.Height = [Math]::Ceiling([System.Windows.SystemParameters]::PrimaryScreenHeight * 0.40) }
+            $memStream = New-Object System.IO.MemoryStream
+            $chart.SaveImage($memStream, [System.Windows.Forms.DataVisualization.Charting.ChartImageFormat]::Png)
+            $memStream.Close()
+
+            $bytes = $memStream.ToArray()
+            $base64 = [Convert]::ToBase64String($bytes)
+            "<img src='data:image/png;base64,$base64' />"
+        }
+        else
+        {
+            throw "Unknown value for As."
+        }
+    }
+}
+
 Function Get-PSChartColors
 {
     if ($Script:ChartColors) { return $Script:ChartColors }

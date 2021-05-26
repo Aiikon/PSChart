@@ -25,6 +25,24 @@ $dataSet2 = for ($i = 0; $i -lt $valueSet1.Count; $i++)
     }
 }
 
+$dataSet3 = @(
+    1..360 | ForEach-Object {
+        [pscustomobject]@{
+            Timestamp = [DateTime]::Today.AddMinutes($_)
+            Value = 1..(($_ % 10)*10) | Get-Random
+            Series = 'A'
+        }
+    }
+
+    1, 360 | ForEach-Object {
+        [pscustomobject]@{
+            Timestamp = [DateTime]::Today.AddMinutes($_)
+            Value = 50
+            Series = 'B'
+        }
+    }
+)
+
 $defaults1 = @{}
 $defaults1.Width = $width
 $defaults1.Height = $height
@@ -49,6 +67,13 @@ $defaultsStackedColumn.Type = 'StackedColumn'
 
     $dataSet1 | New-PSChart @defaultsPie
     $dataSet1 | New-PSChart @defaultsPie -Title "Chart Title"
+
+    "<h1>Sparkline</h1>"
+    $dataSet3 |
+        New-PSSparklineChart -As ImgTag -Width 500 -Height 50 -XProperty Timestamp -YProperty Value -ZProperty Series -SeriesColors @{
+            A = 'Green'
+            B = 'Orange'
+        }
 
     "<h1>Single Series Types</h1>"
 

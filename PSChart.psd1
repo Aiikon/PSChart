@@ -88,6 +88,7 @@ NestedModules = @('PSChart.psm1')
 # Functions to export from this module
 FunctionsToExport = @(
     'New-PSChart'
+    'New-PSSparklineChart'
 )
 
 # Cmdlets to export from this module
